@@ -2,7 +2,7 @@ import sys
 import math
 import time
 import os
-listaCarros = ["Renault Duster", "Renault Kwid", "Kia Picanto", "Chevrolet Onix", "Mazda 3", "Toyota Corolla Cross", "Nissan Qasgqai"]
+listaCarros = ["Renault Duster", "Renault Kwid", "Kia Picanto", "Chevrolet Onix", "Mazda 3", "Toyota Corolla Cross", "Nissan Qashgqai"]
 listaLocalidades = ["Chapinero", "Fontibon", "La Candelaria", "Santa Fe", "Teusaquillo", "Usaquen"]
 listaGasolineras = ["Terpel Javeriana", "Eds Terpel Villa Alsacia", "Texaco Av 68 con Calle 13", "Texaco el Chico", "Primax Olaya", "Primax Calle 100"] 
 
