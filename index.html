@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gasto de gasolina en Bogotá</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap">
+<style>
+:root{--bg:#eef1f4;--card:#fff;--ink:#1c2630;--mute:#5d6b79;--line:#d3dae1;--accent:#a8432b;--accent-ink:#fff;--soft:#f6e6e1;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12181e;--card:#1b242c;--ink:#e8edf1;--mute:#93a1ae;--line:#2c3945;--accent:#e0795f;--accent-ink:#1b1009;--soft:#2e211d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12181e;--card:#1b242c;--ink:#e8edf1;--mute:#93a1ae;--line:#2c3945;--accent:#e0795f;--accent-ink:#1b1009;--soft:#2e211d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.5}
+main{max-width:560px;margin:0 auto;padding:28px 18px 40px}
+h1{font-size:2rem;font-weight:800;line-height:1.1;margin:0 0 6px;letter-spacing:-.02em}
+.sub{color:var(--mute);margin:0 0 24px}
+form{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;display:grid;gap:14px}
+label{display:grid;gap:5px;font-weight:600;font-size:.95rem}
+select{font:inherit;font-weight:400;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:11px 10px;width:100%}
+select:focus-visible{outline:3px solid var(--accent);outline-offset:1px}
+.ruta{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media (max-width:420px){.ruta{grid-template-columns:1fr}}
+.res{margin-top:20px;background:var(--accent);color:var(--accent-ink);border-radius:12px;padding:22px}
+.res .costo{font-size:3rem;font-weight:800;line-height:1;letter-spacing:-.03em}
+.res .lbl{margin:4px 0 0;opacity:.9}
+dl{margin:18px 0 0;display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-size:.95rem}
+dt{opacity:.85}dd{margin:0;text-align:right;font-weight:600}
+.nota{color:var(--mute);font-size:.85rem;margin-top:14px}
+</style>
+</head>
+<body>
+<main>
+<h1>¿Cuánto gasolina gastas?</h1>
+<p class="sub">Elige tu carro, la ruta y la gasolinera para estimar el consumo y el costo.</p>
+
+<form id="f" onsubmit="return false">
+  <label>Vehículo<select id="carro"></select></label>
+  <div class="ruta">
+    <label>Punto de partida<select id="inicio"></select></label>
+    <label>Destino<select id="fin"></select></label>
+  </div>
+  <label>Gasolinera<select id="gas"></select></label>
+</form>
+
+<section class="res" aria-live="polite">
+  <div class="costo" id="costo"></div>
+  <p class="lbl">costo estimado del viaje</p>
+  <dl>
+    <dt>Distancia</dt><dd id="dist"></dd>
+    <dt>Gasolina usada</dt><dd id="gal"></dd>
+    <dt>Precio por galón</dt><dd id="precio"></dd>
+  </dl>
+</section>
+<p class="nota">La distancia es una estimación en línea recta entre localidades, no una ruta real.</p>
+</main>
+
+<script>
+const carros=[["Renault Duster",40],["Renault Kwid",54],["Kia Picanto",52],["Chevrolet Onix",44],["Mazda 3",37],["Toyota Corolla Cross",36],["Nissan Qashqai",28]];
+const localidades=[["Chapinero",28,22],["Fontibón",12,18],["La Candelaria",27,16],["Santa Fe",27,17],["Teusaquillo",22,19],["Usaquén",29,29]];
+const gasolineras=[["Terpel Javeriana",16330],["EDS Terpel Villa Alsacia",15550],["Texaco Av 68 con Calle 13",15500],["Texaco El Chico",16380],["Primax Olaya",15580],["Primax Calle 100",16330]];
+const cop=n=>"$"+Math.round(n).toLocaleString("es-CO");
+const $=id=>document.getElementById(id);
+function llenar(id,items,fmt){$(id).innerHTML=items.map((x,i)=>`<option value="${i}">${fmt(x)}</option>`).join("")}
+llenar("carro",carros,c=>c[0]);
+llenar("inicio",localidades,l=>l[0]);
+llenar("fin",localidades,l=>l[0]);
+llenar("gas",gasolineras,g=>`${g[0]} (${cop(g[1])})`);
+$("fin").value=1;
+function calcular(){
+  const c=carros[$("carro").value],a=localidades[$("inicio").value],b=localidades[$("fin").value],g=gasolineras[$("gas").value];
+  const dist=Math.hypot(a[1]-b[1],a[2]-b[2]);
+  const gal=dist/c[1];
+  $("costo").textContent=cop(gal*g[1]);
+  $("dist").textContent=dist.toFixed(1).replace(".",",")+" km";
+  $("gal").textContent=gal.toFixed(2).replace(".",",")+" gal";
+  $("precio").textContent=cop(g[1]);
+}
+document.getElementById("f").addEventListener("change",calcular);
+calcular();
+</script>
+</body>
+</html>
