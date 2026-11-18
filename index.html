@@ -29,7 +29,7 @@ input,select{font:inherit;color:inherit;width:100%;border:1px solid var(--line);
 .bar{padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);display:grid;gap:8px}.bh{display:flex;align-items:center;gap:8px;font:800 18px 'Bricolage Grotesque',sans-serif}
 .chip{margin-left:auto;border:1px solid var(--line);background:var(--bg);border-radius:20px;padding:4px 12px;font-size:13px;font-weight:600}
 .f{display:flex;align-items:center;gap:10px}.f i{flex:0 0 12px;height:12px;border-radius:50%}.d1{background:var(--ok)}.d2{background:var(--red)}.sw{border:1px solid var(--line);background:var(--bg);border-radius:12px;width:44px;height:44px;font-size:18px}
-.map{flex:1;min-height:0}.map svg{width:100%;height:100%;display:block}
+.map{flex:1;min-height:0}
 .mp{fill:var(--map)}.ld{fill:var(--land)}.hl{fill:var(--hill)}.rd{fill:none;stroke:var(--card);stroke-width:6;stroke-linecap:round}
 .nd{cursor:pointer}.nd text{font:600 12px Figtree,sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--land);stroke-width:3px}
 .rt{fill:none;stroke:var(--ok);stroke-width:5;stroke-linecap:round}
@@ -37,7 +37,7 @@ input,select{font:inherit;color:inherit;width:100%;border:1px solid var(--line);
 .sheet{background:var(--card);border-top:1px solid var(--line);border-radius:20px 20px 0 0;padding:16px 20px 20px}
 .big{font-size:40px;font-weight:800;line-height:1}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px}.g3 div{font-size:12px;color:var(--mut)}.g3 b{display:block;font-size:17px;color:var(--ink)}
 .map{isolation:isolate;position:relative}#mp{height:100%;width:100%}.ac{position:relative;flex:1}.sg{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden}.sg.on{display:block}.sg button{display:block;width:100%;text-align:left;border:0;background:none;padding:10px 12px;font-size:14px}.sg button:hover{background:var(--bg)}.np{padding:10px 12px;margin:0}
-</style></head><body>
+.tm{font-size:13px;color:var(--mut)}#hr{flex:1;width:auto;padding:8px 12px}.f .chip{margin-left:0}</style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="car" viewBox="0 0 120 56"><path fill="currentColor" d="M6 40V30q0-5 6-6l16-4 12-12q3-3 7-3h24q4 0 7 3l12 12 14 3q6 1 6 7v10z"/><path d="M44 21l8-8h22l10 8z" style="fill:var(--card)"/><circle cx="30" cy="42" r="9" fill="currentColor" style="stroke:var(--card);stroke-width:3"/><circle cx="92" cy="42" r="9" fill="currentColor" style="stroke:var(--card);stroke-width:3"/></symbol><symbol id="mo" viewBox="0 0 120 56"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="40" r="11"/><circle cx="96" cy="40" r="11"/><path d="M24 40l20-16h24l28 16M44 24l-5-9h-10M68 24l8-13h14"/></g><rect x="44" y="18" width="26" height="6" rx="3" fill="currentColor"/></symbol></svg>
 <main id="app"></main>
 <script>
@@ -55,7 +55,11 @@ try{if(P.done&&BR()&&MO()&&ST[S.st]&&S.y)S.step=5}catch(e){}
 let U=[4.65,-74.08],uT='el centro de Bogotá';
 try{navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{U=[p.coords.latitude,p.coords.longitude];uT='tu ubicación';if(S.step==3)render()},()=>{})}catch(e){}
 const D=(a,b,c,d)=>{const r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,h=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 12742*Math.asin(Math.sqrt(h))};
-const eff=()=>MO()[1]*.9*(1-(2026-S.y)*.004);
+const bog=()=>new Date(new Date().toLocaleString('en-US',{timeZone:'America/Bogota'})),hm=d=>String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+let HR=null,LR=null;
+const TB=[[0,5,1,.95],[5,6,1.3,.92],[6,9,1.6,.82],[9,15,1.45,.85],[15,17,1.6,.82],[17,19.5,1.9,.78],[19.5,21,1.4,.87],[21,22,1.15,.92],[22,24,1,.95]];
+function TR(){const n=bog(),s=HR||hm(n),h=+s.slice(0,2)+ +s.slice(3,5)/60,k=[.4,1,1,1,1,1,.8][n.getDay()],r=TB.find(x=>h>=x[0]&&h<x[1])||TB[0],t=1+(r[2]-1)*k,f=.95-(.95-r[3])*k;return{t,f,s,l:t>=1.6?'pesado':t>=1.3?'moderado':'fluido'}}
+const eff=f=>MO()[1]*(1-(2026-S.y)*.004)*f;
 const logo=s=>`<svg width="${s}" height="${s}" viewBox="0 0 48 48" role="img" aria-label="RutaFuel"><rect x=".5" y=".5" width="47" height="47" rx="13" fill="#14213D" stroke="#2C4170"/><path d="M24 7C24 7 13 20 13 28a11 11 0 0 0 22 0C35 20 24 7 24 7z" fill="#FFB703"/><path d="M20 36q10-4 1-9t5-10" fill="none" stroke="#14213D" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 4"/></svg>`;
 const ic=t=>`<svg class="ic" viewBox="0 0 120 56"><use href="#${t=='c'?'car':'mo'}"/></svg>`;
 const tile=(b,t)=>`<button class="tile" data-a="brand" data-t="${t}" data-b="${b[0]}"><span class="lg" style="background:${b[2]};color:${b[3]}">${b[1]}</span>${b[0]}</button>`;
@@ -69,11 +73,12 @@ const F=[()=>'<button class="bt" data-a="next">Comenzar</button>',()=>bk,()=>bk+
 let LM,MK=[],RL,A=null,Z=null,TO,TK=0;const SG={};
 const E=s=>s.replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';'),nm=x=>x.display_name.split(',').slice(0,2).join(',');
 const field=(id,ph,c)=>`<div class="f"><i class="${c}"></i><div class="ac"><input id="${id}" placeholder="${ph}" autocomplete="off" aria-label="${ph}"><div class="sg" id="${id}s"></div></div>${id=='oz'?'<button class="sw" data-a="sw" aria-label="Invertir ruta">⇅</button>':''}</div>`;
-const main=()=>`<div class="bar"><div class="bh">${logo(30)}RutaFuel<button class="chip" data-a="edit">${S.m} ${S.y}</button></div>${field('oa','Punto de partida','d1')}${field('oz','Destino','d2')}</div><div class="map"><div id="mp"></div></div><div class="sheet" id="sh"></div>`;
+const main=()=>`<div class="bar"><div class="bh">${logo(30)}RutaFuel<button class="chip" data-a="edit">${S.m} ${S.y}</button></div>${field('oa','Punto de partida','d1')}${field('oz','Destino','d2')}<div class="f"><i></i><span class="tm">Salida</span><input id="hr" type="time" value="${HR||hm(bog())}" aria-label="Hora de salida"><button class="chip" data-a="now">Ahora</button></div></div><div class="map"><div id="mp"></div></div><div class="sheet" id="sh"></div>`;
 const hint='<p>Escribe una dirección, barrio o lugar, o toca el mapa para elegir tu punto de partida y tu destino.</p>';
-function sheet(km,min,apx){const e=eff(),L=km/e,g=L/3.785,s=ST[S.st];$('#sh').innerHTML=`<div class="big">${fmt(g*s[4])}</div><small>costo estimado del viaje</small><div class="g3"><div><b>${nf(km)} km</b>distancia</div><div><b>${nf(g,2)} gal</b>${nf(L)} litros</div><div><b>${nf(e)} km/L</b>consumo</div></div><p class="n">${S.b} ${S.m} ${S.y}, tanqueando en ${s[0]} a ${fmt(s[4])} por galón.${min?' Unos '+Math.round(min)+' min sin tráfico.':''}${apx?' No se pudo trazar la ruta; la distancia es aproximada.':''}</p>`}
-async function route(){const t=++TK;$('#sh').innerHTML='<p>Calculando ruta…</p>';try{const r=await(await fetch(`https://router.project-osrm.org/route/v1/driving/${A.lng},${A.lat};${Z.lng},${Z.lat}?overview=full&geometries=geojson`)).json(),q=r.routes[0];if(t!=TK||!LM)return;RL=L.geoJSON(q.geometry,{style:{color:'#0E9AA7',weight:6}}).addTo(LM);LM.fitBounds(RL.getBounds(),{padding:[40,40]});sheet(q.distance/1000,q.duration/60,0)}catch(e){if(t!=TK||!LM)return;sheet(D(A.lat,A.lng,Z.lat,Z.lng)*1.35,0,1)}}
-function draw(){if(!LM)return;MK.forEach(m=>m.remove());MK=[];if(RL){RL.remove();RL=null}TK++;
+function sheet(km,min,apx){LR={km,min,apx};const r=TR(),e=eff(r.f),L=km/e,g=L/3.785,s=ST[S.st],mn=Math.round(min*r.t),ex=Math.round((.95/r.f-1)*100);
+$('#sh').innerHTML=`<div class="big">${fmt(g*s[4])}</div><small>costo estimado del viaje</small><div class="g3"><div><b>${nf(km)} km</b>distancia</div><div><b>${nf(g,2)} gal</b>${nf(L)} litros</div><div><b>${nf(e)} km/L</b>consumo</div></div><p class="n"><b>Tráfico ${r.l}</b> a las ${r.s}: unos ${mn} min${ex>0?' y '+ex+'% más de consumo que en vía fluida':''}.</p><p class="n">${S.b} ${S.m} ${S.y}, tanqueando en ${s[0]} a ${fmt(s[4])} por galón.${apx?' No se pudo trazar la ruta; la distancia es aproximada.':''}</p>`}
+async function route(){const t=++TK;$('#sh').innerHTML='<p>Calculando ruta…</p>';try{const r=await(await fetch(`https://router.project-osrm.org/route/v1/driving/${A.lng},${A.lat};${Z.lng},${Z.lat}?overview=full&geometries=geojson`)).json(),q=r.routes[0];if(t!=TK||!LM)return;const gj=L.geoJSON(q.geometry,{style:{color:'#0E9AA7',weight:6}});RL=L.layerGroup([L.geoJSON(q.geometry,{style:{color:'#fff',weight:11,opacity:.95}}),gj]).addTo(LM);LM.fitBounds(gj.getBounds(),{padding:[40,40]});sheet(q.distance/1000,q.duration/60,0)}catch(e){if(t!=TK||!LM)return;RL=L.polyline([[A.lat,A.lng],[Z.lat,Z.lng]],{color:'#0E9AA7',weight:5,dashArray:'8 8'}).addTo(LM);LM.fitBounds(RL.getBounds(),{padding:[40,40]});const k=D(A.lat,A.lng,Z.lat,Z.lng)*1.35;sheet(k,k/35*60,1)}}
+function draw(){if(!LM)return;MK.forEach(m=>m.remove());MK=[];if(RL){RL.remove();RL=null}TK++;LR=null;
 [[A,'#0E9AA7'],[Z,'#E5384B']].forEach(([p,c])=>{if(p)MK.push(L.circleMarker([p.lat,p.lng],{radius:9,color:'#fff',weight:3,fillColor:c,fillOpacity:1}).addTo(LM))});
 if(A&&Z)route();else{const p=A||Z;if(p)LM.setView([p.lat,p.lng],14);$('#sh').innerHTML=hint}}
 const setP=(k,p)=>{if(k=='a')A=p;else Z=p;$('#o'+k).value=p.n;draw()};
@@ -85,6 +90,7 @@ function render(){if(LM){LM.remove();LM=null}const s=S.step;app.innerHTML=s<5?`<
 app.addEventListener('click',e=>{const t=e.target.closest('[data-a]'),d=t&&t.dataset;
 if(d&&d.a=='sug'){const p=SG[d.f][+d.i];setP(d.f[1],{n:nm(p),lat:+p.lat,lng:+p.lon});$('#'+d.f+'s').className='sg'}
 else if(d&&d.a=='sw'){[A,Z]=[Z,A];$('#oa').value=A?A.n:'';$('#oz').value=Z?Z.n:'';draw()}
+else if(d&&d.a=='now'){HR=null;$('#hr').value=hm(bog());if(LR)sheet(LR.km,LR.min,LR.apx)}
 else if(!e.target.closest('.ac'))document.querySelectorAll('.sg').forEach(x=>x.className='sg')});
 app.addEventListener('input',e=>{const id=e.target.id;if(id!='oa'&&id!='oz')return;clearTimeout(TO);const q=e.target.value.trim(),sg=$('#'+id+'s');if(q.length<3){sg.className='sg';return}
 TO=setTimeout(async()=>{try{const r=await(await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=co&viewbox=-74.25,4.84,-73.99,4.45&bounded=1&q=${encodeURIComponent(q)}`)).json();SG[id]=r;sg.innerHTML=r.length?r.map((x,i)=>`<button data-a="sug" data-f="${id}" data-i="${i}">${E(x.display_name.split(',').slice(0,3).join(','))}</button>`).join(''):'<p class="np">Sin resultados. Prueba con un barrio, una calle o un lugar conocido.</p>'}catch(e){sg.innerHTML='<p class="np">No se pudo buscar. Revisa tu conexión.</p>'}sg.className='sg on'},500)});
@@ -100,5 +106,6 @@ else if(a=='swap'){[S.a,S.z]=[S.z,S.a];go()}
 else if(a=='edit')go(1)};
 app.onchange=e=>{const i=e.target.id;if(i!='sa'&&i!='sz')return;const v=e.target.value===''?null:+e.target.value;if(i=='sa')S.a=v;else S.z=v;go()};
 app.oninput=e=>{if(e.target.id!='q')return;const q=e.target.value.trim().toLowerCase();$('#res').innerHTML=q?(ALL.filter(x=>(x.b+' '+x.m).toLowerCase().includes(q)).slice(0,6).map(x=>`<button class="card rs" data-a="pick" data-t="${x.t}" data-b="${x.b}" data-m="${x.m}">${x.b} ${x.m}</button>`).join('')||'<p>Sin resultados. Prueba con otra marca o modelo.</p>'):''};
+app.addEventListener('change',e=>{if(e.target.id=='hr'){HR=e.target.value||null;if(LR)sheet(LR.km,LR.min,LR.apx)}});
 render();
 </script></body></html>
