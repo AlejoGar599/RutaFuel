@@ -1,0 +1,104 @@
+<!DOCTYPE html><html lang="es"><head><meta charset="utf-8"><title>RutaFuel</title>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Figtree:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css"><script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{--bg:#F4F6FA;--card:#fff;--ink:#14213D;--mut:#55647E;--line:#D9E0EA;--pri:#14213D;--on:#fff;--acc:#FFB703;--ok:#0E9AA7;--red:#E5384B;--map:#DCE6F0;--land:#EEF2F7;--hill:#C9E0CF;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B1220;--card:#15213A;--ink:#EDF2FB;--mut:#9AA9C4;--line:#27365A;--pri:#FFB703;--on:#14213D;--map:#0A1424;--land:#101C33;--hill:#12302B;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B1220;--card:#15213A;--ink:#EDF2FB;--mut:#9AA9C4;--line:#27365A;--pri:#FFB703;--on:#14213D;--map:#0A1424;--land:#101C33;--hill:#12302B;color-scheme:dark}
+*{box-sizing:border-box}html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}body{height:100%;margin:0;background:var(--bg);color:var(--ink);font:400 15px/1.45 Figtree,system-ui,sans-serif}
+#app{max-width:520px;height:100%;margin:auto;display:flex;flex-direction:column}
+h1,h2,h3,.big{font-family:'Bricolage Grotesque',system-ui,sans-serif;margin:0}h1{font-size:32px;line-height:1.1}h2{font-size:25px}h3{font-size:15px;margin:16px 0 8px}
+p{margin:6px 0;color:var(--mut)}small{color:var(--mut);display:block}.n{font-size:13px}
+.pg{flex:1;overflow:auto;padding:18px 20px}.dots{display:flex;gap:6px;padding:14px 20px 0}.dots i{flex:1;height:4px;border-radius:2px;background:var(--line)}.dots i.on{background:var(--acc)}
+.ft{display:flex;gap:10px;padding:12px 20px 16px}button{font:inherit;color:inherit;cursor:pointer}
+.bt{flex:1;border:0;border-radius:14px;padding:14px;background:var(--pri);color:var(--on);font-weight:600}.bt:disabled{opacity:.35;cursor:default}.bt.g{background:none;color:var(--mut);flex:0 0 auto}
+:focus-visible{outline:3px solid var(--ok);outline-offset:2px}
+input,select{font:inherit;color:inherit;width:100%;border:1px solid var(--line);background:var(--card);border-radius:12px;padding:12px}
+.row{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 2px 8px}
+.tile,.card{background:var(--card);border:2px solid var(--line);border-radius:16px;scroll-snap-align:start;text-align:left}
+.tile{flex:0 0 94px;display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 6px;font-weight:600;font-size:13px}
+.lg{flex:0 0 auto;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font:800 16px 'Bricolage Grotesque',sans-serif}
+.mod{flex:1 0 112px;padding:10px;display:flex;flex-direction:column;gap:6px}.ic{width:100%;height:46px;color:var(--ink)}
+.sel{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc)}
+.rs{display:block;width:100%;margin:6px 0;padding:10px 12px}
+.yrs{height:170px;overflow-y:auto;scroll-snap-type:y mandatory;border:1px solid var(--line);border-radius:14px;background:var(--card)}
+.yr{display:block;width:100%;border:0;background:none;padding:12px;scroll-snap-align:center;font:600 18px Figtree,sans-serif}.yr.sel{background:var(--acc);color:#14213D;box-shadow:none}
+.stn{display:flex;align-items:center;gap:12px;width:100%;padding:12px;margin-bottom:8px}.gr{flex:1}.gr b{display:block}
+.c0{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:100%;gap:8px}
+.bar{padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line);display:grid;gap:8px}.bh{display:flex;align-items:center;gap:8px;font:800 18px 'Bricolage Grotesque',sans-serif}
+.chip{margin-left:auto;border:1px solid var(--line);background:var(--bg);border-radius:20px;padding:4px 12px;font-size:13px;font-weight:600}
+.f{display:flex;align-items:center;gap:10px}.f i{flex:0 0 12px;height:12px;border-radius:50%}.d1{background:var(--ok)}.d2{background:var(--red)}.sw{border:1px solid var(--line);background:var(--bg);border-radius:12px;width:44px;height:44px;font-size:18px}
+.map{flex:1;min-height:0}.map svg{width:100%;height:100%;display:block}
+.mp{fill:var(--map)}.ld{fill:var(--land)}.hl{fill:var(--hill)}.rd{fill:none;stroke:var(--card);stroke-width:6;stroke-linecap:round}
+.nd{cursor:pointer}.nd text{font:600 12px Figtree,sans-serif;fill:var(--ink);paint-order:stroke;stroke:var(--land);stroke-width:3px}
+.rt{fill:none;stroke:var(--ok);stroke-width:5;stroke-linecap:round}
+@media(prefers-reduced-motion:no-preference){.rt{stroke-dasharray:1;stroke-dashoffset:1;animation:dr 1s ease forwards}@keyframes dr{to{stroke-dashoffset:0}}}
+.sheet{background:var(--card);border-top:1px solid var(--line);border-radius:20px 20px 0 0;padding:16px 20px 20px}
+.big{font-size:40px;font-weight:800;line-height:1}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px}.g3 div{font-size:12px;color:var(--mut)}.g3 b{display:block;font-size:17px;color:var(--ink)}
+.map{isolation:isolate;position:relative}#mp{height:100%;width:100%}.ac{position:relative;flex:1}.sg{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden}.sg.on{display:block}.sg button{display:block;width:100%;text-align:left;border:0;background:none;padding:10px 12px;font-size:14px}.sg button:hover{background:var(--bg)}.np{padding:10px 12px;margin:0}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="car" viewBox="0 0 120 56"><path fill="currentColor" d="M6 40V30q0-5 6-6l16-4 12-12q3-3 7-3h24q4 0 7 3l12 12 14 3q6 1 6 7v10z"/><path d="M44 21l8-8h22l10 8z" style="fill:var(--card)"/><circle cx="30" cy="42" r="9" fill="currentColor" style="stroke:var(--card);stroke-width:3"/><circle cx="92" cy="42" r="9" fill="currentColor" style="stroke:var(--card);stroke-width:3"/></symbol><symbol id="mo" viewBox="0 0 120 56"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="40" r="11"/><circle cx="96" cy="40" r="11"/><path d="M24 40l20-16h24l28 16M44 24l-5-9h-10M68 24l8-13h14"/></g><rect x="44" y="18" width="26" height="6" rx="3" fill="currentColor"/></symbol></svg>
+<main id="app"></main>
+<script>
+const $=q=>document.querySelector(q),app=$('#app'),fmt=n=>'$'+Math.round(n).toLocaleString('es-CO'),nf=(x,d=1)=>x.toFixed(d).replace('.',',');
+const K=[["Chevrolet","CH","#1D5FB4","#fff",[["Spark GT",14],["Sail",13],["Onix",13]]],["Renault","RN","#FFD60A","#14213D",[["Logan",13],["Sandero",13],["Duster",11]]],["Mazda","MZ","#6E7F94","#fff",[["Mazda 2",14],["Mazda 3",12],["CX-30",11]]],["Kia","KI","#1B1B1F","#fff",[["Picanto",15],["Rio",14],["Sportage",10.5]]],["Toyota","TY","#D7263D","#fff",[["Yaris",14],["Corolla",13],["RAV4",11]]]];
+const M=[["Yamaha","YA","#3B3FA8","#fff",[["FZ 2.0",38],["NMAX",40],["XTZ 125",42]]],["Honda","HO","#E5232E","#fff",[["CB 125F",45],["XR 150L",40],["Navi",55]]],["AKT","AK","#F58220","#14213D",[["NKD 125",42],["CR4 150",38],["TT 180",35]]],["Bajaj","BJ","#00A19B","#fff",[["Boxer CT100",55],["Pulsar NS160",36],["Pulsar NS200",32]]],["Suzuki","SZ","#0B6EB7","#fff",[["GN 125",45],["Gixxer 150",38],["V-Strom 250",30]]]];
+const ALL=[].concat(...K.map(b=>b[4].map(m=>({t:'c',b:b[0],m:m[0]}))),...M.map(b=>b[4].map(m=>({t:'m',b:b[0],m:m[0]}))));
+const ST=[["Terpel","Calle 72 con Cra 11",4.6585,-74.0605,16450,"#E31B23","#fff"],["Primax","Av. Boyacá con Calle 80",4.681,-74.095,16390,"#0057B8","#fff"],["Biomax","Cra 30 con Calle 45",4.642,-74.078,16360,"#00A651","#fff"],["Texaco","Av. El Dorado, Calle 26",4.649,-74.106,16480,"#333","#fff"],["Mobil","Autopista Norte, Calle 127",4.709,-74.056,16510,"#1D3E91","#fff"],["Brío","Cra 68 con Calle 6",4.63,-74.12,16340,"#F7941D","#14213D"],["Terpel","Av. Suba con Calle 145",4.74,-74.09,16420,"#E31B23","#fff"]];
+const N=[["Usaquén",4.71,-74.03],["Suba",4.741,-74.083],["Fontibón",4.674,-74.145],["Teusaquillo",4.635,-74.083],["La Candelaria",4.596,-74.073],["Kennedy",4.628,-74.15],["Ciudad Bolívar",4.54,-74.16]];
+const X=n=>[(n[2]+74.2)/.2*340+30,(4.78-n[1])/.3*400+30],YR=Array.from({length:17},(_,i)=>2026-i);
+let P={};try{P=JSON.parse(localStorage.getItem('rf')||'{}')}catch(e){}
+const S={step:0,t:P.t,b:P.b,m:P.m,y:P.y,st:P.st==null?null:P.st,a:null,z:null};
+const BR=()=>(S.t=='c'?K:M).find(b=>b[0]==S.b),MO=()=>BR()[4].find(m=>m[0]==S.m);
+try{if(P.done&&BR()&&MO()&&ST[S.st]&&S.y)S.step=5}catch(e){}
+let U=[4.65,-74.08],uT='el centro de Bogotá';
+try{navigator.geolocation&&navigator.geolocation.getCurrentPosition(p=>{U=[p.coords.latitude,p.coords.longitude];uT='tu ubicación';if(S.step==3)render()},()=>{})}catch(e){}
+const D=(a,b,c,d)=>{const r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,h=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 12742*Math.asin(Math.sqrt(h))};
+const eff=()=>MO()[1]*.9*(1-(2026-S.y)*.004);
+const logo=s=>`<svg width="${s}" height="${s}" viewBox="0 0 48 48" role="img" aria-label="RutaFuel"><rect x=".5" y=".5" width="47" height="47" rx="13" fill="#14213D" stroke="#2C4170"/><path d="M24 7C24 7 13 20 13 28a11 11 0 0 0 22 0C35 20 24 7 24 7z" fill="#FFB703"/><path d="M20 36q10-4 1-9t5-10" fill="none" stroke="#14213D" stroke-width="3" stroke-linecap="round" stroke-dasharray="6 4"/></svg>`;
+const ic=t=>`<svg class="ic" viewBox="0 0 120 56"><use href="#${t=='c'?'car':'mo'}"/></svg>`;
+const tile=(b,t)=>`<button class="tile" data-a="brand" data-t="${t}" data-b="${b[0]}"><span class="lg" style="background:${b[2]};color:${b[3]}">${b[1]}</span>${b[0]}</button>`;
+const bk='<button class="bt g" data-a="back">Atrás</button>';
+const V=[()=>`<div class="c0">${logo(104)}<h1>Bienvenido a RutaFuel</h1><p>Calcula cuánto combustible y cuánto dinero gastará cada ruta. Completa tu perfil en los siguientes pasos para comenzar.</p></div>`,
+()=>`<h2>Tu vehículo</h2><p>Elige la marca o busca tu modelo exacto.</p><input id="q" type="search" placeholder="Buscar, ej. Mazda 3 o NMAX" autocomplete="off" aria-label="Buscar modelo"><div id="res"></div><h3>Carros</h3><div class="row">${K.map(b=>tile(b,'c')).join('')}</div><h3>Motos</h3><div class="row">${M.map(b=>tile(b,'m')).join('')}</div>`,
+()=>`<h2>${S.b}</h2><p>Elige tu modelo y el año.</p><div class="row">${BR()[4].map(m=>`<button class="card mod${S.m==m[0]?' sel':''}" data-a="model" data-m="${m[0]}">${ic(S.t)}<b>${m[0]}</b></button>`).join('')}</div><h3>Año del modelo</h3><div class="yrs">${YR.map(y=>`<button class="yr${S.y==y?' sel':''}" data-a="year" data-y="${y}">${y}</button>`).join('')}</div>`,
+()=>{const L=ST.map((s,i)=>({s,i,d:D(U[0],U[1],s[2],s[3])})).sort((a,b)=>a.d-b.d);return `<h2>Tu gasolinera</h2><p>Ordenadas por cercanía desde ${uT}. Precio por galón de gasolina corriente.</p>${L.map(({s,i,d})=>`<button class="card stn${S.st==i?' sel':''}" data-a="st" data-i="${i}"><span class="lg" style="background:${s[5]};color:${s[6]}">${s[0][0]}</span><span class="gr"><b>${s[0]}</b><small>${s[1]}, a ${nf(d)} km</small></span><strong>${fmt(s[4])}</strong></button>`).join('')}<p class="n">Precios simulados a partir del precio de referencia oficial de Bogotá.</p>`},
+()=>`<div class="c0">${logo(72)}<h1>¡Todo listo!</h1><p>Ahora ingresa tu ruta y descubre cuánto gastarás.</p><div class="card" style="padding:14px;margin-top:10px"><b>${S.b} ${S.m} ${S.y}</b><small>${ST[S.st][0]}, ${fmt(ST[S.st][4])} por galón</small></div></div>`];
+const F=[()=>'<button class="bt" data-a="next">Comenzar</button>',()=>bk,()=>bk+`<button id="nx" class="bt" data-a="next" ${S.m&&S.y?'':'disabled'}>Continuar</button>`,()=>bk+`<button id="nx" class="bt" data-a="next" ${S.st==null?'disabled':''}>Continuar</button>`,()=>bk+'<button class="bt" data-a="fin">Ir al mapa</button>'];
+let LM,MK=[],RL,A=null,Z=null,TO,TK=0;const SG={};
+const E=s=>s.replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';'),nm=x=>x.display_name.split(',').slice(0,2).join(',');
+const field=(id,ph,c)=>`<div class="f"><i class="${c}"></i><div class="ac"><input id="${id}" placeholder="${ph}" autocomplete="off" aria-label="${ph}"><div class="sg" id="${id}s"></div></div>${id=='oz'?'<button class="sw" data-a="sw" aria-label="Invertir ruta">⇅</button>':''}</div>`;
+const main=()=>`<div class="bar"><div class="bh">${logo(30)}RutaFuel<button class="chip" data-a="edit">${S.m} ${S.y}</button></div>${field('oa','Punto de partida','d1')}${field('oz','Destino','d2')}</div><div class="map"><div id="mp"></div></div><div class="sheet" id="sh"></div>`;
+const hint='<p>Escribe una dirección, barrio o lugar, o toca el mapa para elegir tu punto de partida y tu destino.</p>';
+function sheet(km,min,apx){const e=eff(),L=km/e,g=L/3.785,s=ST[S.st];$('#sh').innerHTML=`<div class="big">${fmt(g*s[4])}</div><small>costo estimado del viaje</small><div class="g3"><div><b>${nf(km)} km</b>distancia</div><div><b>${nf(g,2)} gal</b>${nf(L)} litros</div><div><b>${nf(e)} km/L</b>consumo</div></div><p class="n">${S.b} ${S.m} ${S.y}, tanqueando en ${s[0]} a ${fmt(s[4])} por galón.${min?' Unos '+Math.round(min)+' min sin tráfico.':''}${apx?' No se pudo trazar la ruta; la distancia es aproximada.':''}</p>`}
+async function route(){const t=++TK;$('#sh').innerHTML='<p>Calculando ruta…</p>';try{const r=await(await fetch(`https://router.project-osrm.org/route/v1/driving/${A.lng},${A.lat};${Z.lng},${Z.lat}?overview=full&geometries=geojson`)).json(),q=r.routes[0];if(t!=TK||!LM)return;RL=L.geoJSON(q.geometry,{style:{color:'#0E9AA7',weight:6}}).addTo(LM);LM.fitBounds(RL.getBounds(),{padding:[40,40]});sheet(q.distance/1000,q.duration/60,0)}catch(e){if(t!=TK||!LM)return;sheet(D(A.lat,A.lng,Z.lat,Z.lng)*1.35,0,1)}}
+function draw(){if(!LM)return;MK.forEach(m=>m.remove());MK=[];if(RL){RL.remove();RL=null}TK++;
+[[A,'#0E9AA7'],[Z,'#E5384B']].forEach(([p,c])=>{if(p)MK.push(L.circleMarker([p.lat,p.lng],{radius:9,color:'#fff',weight:3,fillColor:c,fillOpacity:1}).addTo(LM))});
+if(A&&Z)route();else{const p=A||Z;if(p)LM.setView([p.lat,p.lng],14);$('#sh').innerHTML=hint}}
+const setP=(k,p)=>{if(k=='a')A=p;else Z=p;$('#o'+k).value=p.n;draw()};
+function initMap(){LM=L.map('mp',{zoomControl:false}).setView([4.65,-74.08],12);L.control.zoom({position:'bottomright'}).addTo(LM);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',{maxZoom:19,attribution:'© OpenStreetMap'}).addTo(LM);
+if(A)$('#oa').value=A.n;if(Z)$('#oz').value=Z.n;draw();setTimeout(()=>LM&&LM.invalidateSize(),60);
+LM.on('click',async e=>{const k=!A?'a':'z',p={n:'Punto en el mapa',lat:e.latlng.lat,lng:e.latlng.lng};setP(k,p);try{const r=await(await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=17&lat=${p.lat}&lon=${p.lng}`)).json();if(r.display_name&&$('#o'+k)){p.n=nm(r);$('#o'+k).value=p.n}}catch(e){}})}
+function render(){if(LM){LM.remove();LM=null}const s=S.step;app.innerHTML=s<5?`<div class="dots">${[0,1,2,3,4].map(i=>`<i class="${i<=s?'on':''}"></i>`).join('')}</div><div class="pg">${V[s]()}</div><div class="ft">${F[s]()}</div>`:main();if(s==5)initMap()}
+app.addEventListener('click',e=>{const t=e.target.closest('[data-a]'),d=t&&t.dataset;
+if(d&&d.a=='sug'){const p=SG[d.f][+d.i];setP(d.f[1],{n:nm(p),lat:+p.lat,lng:+p.lon});$('#'+d.f+'s').className='sg'}
+else if(d&&d.a=='sw'){[A,Z]=[Z,A];$('#oa').value=A?A.n:'';$('#oz').value=Z?Z.n:'';draw()}
+else if(!e.target.closest('.ac'))document.querySelectorAll('.sg').forEach(x=>x.className='sg')});
+app.addEventListener('input',e=>{const id=e.target.id;if(id!='oa'&&id!='oz')return;clearTimeout(TO);const q=e.target.value.trim(),sg=$('#'+id+'s');if(q.length<3){sg.className='sg';return}
+TO=setTimeout(async()=>{try{const r=await(await fetch(`https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5&countrycodes=co&viewbox=-74.25,4.84,-73.99,4.45&bounded=1&q=${encodeURIComponent(q)}`)).json();SG[id]=r;sg.innerHTML=r.length?r.map((x,i)=>`<button data-a="sug" data-f="${id}" data-i="${i}">${E(x.display_name.split(',').slice(0,3).join(','))}</button>`).join(''):'<p class="np">Sin resultados. Prueba con un barrio, una calle o un lugar conocido.</p>'}catch(e){sg.innerHTML='<p class="np">No se pudo buscar. Revisa tu conexión.</p>'}sg.className='sg on'},500)});
+const go=n=>{if(n!=null)S.step=n;render()};
+app.onclick=e=>{const t=e.target.closest('[data-a]');if(!t)return;const d=t.dataset,a=d.a;
+if(a=='next')go(S.step+1);else if(a=='back')go(S.step-1);
+else if(a=='brand'){S.t=d.t;S.b=d.b;S.m=S.y=null;go(2)}
+else if(a=='pick'){S.t=d.t;S.b=d.b;S.m=d.m;S.y=null;go(2)}
+else if(a=='model'||a=='year'||a=='st'){t.parentElement.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));t.classList.add('sel');if(a=='model')S.m=d.m;else if(a=='year')S.y=+d.y;else S.st=+d.i;const n=$('#nx');if(n)n.disabled=S.step==2?!(S.m&&S.y):false}
+else if(a=='fin'){try{localStorage.setItem('rf',JSON.stringify({done:1,t:S.t,b:S.b,m:S.m,y:S.y,st:S.st}))}catch(e){}go(5)}
+else if(a=='node'){const i=+d.i;if(i==S.a)return;if(S.a==null)S.a=i;else S.z=i;go()}
+else if(a=='swap'){[S.a,S.z]=[S.z,S.a];go()}
+else if(a=='edit')go(1)};
+app.onchange=e=>{const i=e.target.id;if(i!='sa'&&i!='sz')return;const v=e.target.value===''?null:+e.target.value;if(i=='sa')S.a=v;else S.z=v;go()};
+app.oninput=e=>{if(e.target.id!='q')return;const q=e.target.value.trim().toLowerCase();$('#res').innerHTML=q?(ALL.filter(x=>(x.b+' '+x.m).toLowerCase().includes(q)).slice(0,6).map(x=>`<button class="card rs" data-a="pick" data-t="${x.t}" data-b="${x.b}" data-m="${x.m}">${x.b} ${x.m}</button>`).join('')||'<p>Sin resultados. Prueba con otra marca o modelo.</p>'):''};
+render();
+</script></body></html>
