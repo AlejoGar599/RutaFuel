@@ -37,7 +37,9 @@ input,select{font:inherit;color:inherit;width:100%;border:1px solid var(--line);
 .sheet{background:var(--card);border-top:1px solid var(--line);border-radius:20px 20px 0 0;padding:16px 20px 20px}
 .big{font-size:40px;font-weight:800;line-height:1}.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0 4px}.g3 div{font-size:12px;color:var(--mut)}.g3 b{display:block;font-size:17px;color:var(--ink)}
 .map{isolation:isolate;position:relative}#mp{height:100%;width:100%}.ac{position:relative;flex:1}.sg{display:none;position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);overflow:hidden}.sg.on{display:block}.sg button{display:block;width:100%;text-align:left;border:0;background:none;padding:10px 12px;font-size:14px}.sg button:hover{background:var(--bg)}.np{padding:10px 12px;margin:0}
-.tm{font-size:13px;color:var(--mut)}#hr{flex:1;width:auto;padding:8px 12px}.f .chip{margin-left:0}</style></head><body>
+.tm{font-size:13px;color:var(--mut)}#hr{flex:1;width:auto;padding:8px 12px}.f .chip{margin-left:0}
+.sw{flex:0 0 44px;display:grid;place-items:center;padding:0}.sw svg{width:22px;height:22px}.sw.lc{color:var(--ok)}.sw:disabled{opacity:.6;cursor:default}
+@media(prefers-reduced-motion:no-preference){.sw.wait svg{animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}}</style></head><body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="car" viewBox="0 0 120 56"><path fill="currentColor" d="M6 40V30q0-5 6-6l16-4 12-12q3-3 7-3h24q4 0 7 3l12 12 14 3q6 1 6 7v10z"/><path d="M44 21l8-8h22l10 8z" style="fill:var(--card)"/><circle cx="30" cy="42" r="9" fill="currentColor" style="stroke:var(--card);stroke-width:3"/><circle cx="92" cy="42" r="9" fill="currentColor" style="stroke:var(--card);stroke-width:3"/></symbol><symbol id="mo" viewBox="0 0 120 56"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="40" r="11"/><circle cx="96" cy="40" r="11"/><path d="M24 40l20-16h24l28 16M44 24l-5-9h-10M68 24l8-13h14"/></g><rect x="44" y="18" width="26" height="6" rx="3" fill="currentColor"/></symbol></svg>
 <main id="app"></main>
 <script>
@@ -75,7 +77,18 @@ const V=[()=>`<div class="c0">${logo(104)}<h1>Bienvenido a RutaFuel</h1><p>Calcu
 const F=[()=>'<button class="bt" data-a="next">Comenzar</button>',()=>bk,()=>bk+`<button id="nx" class="bt" data-a="next" ${S.m&&S.y?'':'disabled'}>Continuar</button>`,()=>bk+`<button id="nx" class="bt" data-a="next" ${S.st==null?'disabled':''}>Continuar</button>`,()=>bk+'<button class="bt" data-a="fin">Ir al mapa</button>'];
 let LM,MK=[],RL,A=null,Z=null,TO,TK=0;const SG={};
 const E=s=>s.replace(/[&<>"]/g,c=>'&#'+c.charCodeAt(0)+';'),nm=x=>x.display_name.split(',').slice(0,2).join(',');
-const field=(id,ph,c)=>`<div class="f"><i class="${c}"></i><div class="ac"><input id="${id}" placeholder="${ph}" autocomplete="off" aria-label="${ph}"><div class="sg" id="${id}s"></div></div>${id=='oz'?'<button class="sw" data-a="sw" aria-label="Invertir ruta">⇅</button>':''}</div>`;
+const LOC='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg>';
+const field=(id,ph,c)=>`<div class="f"><i class="${c}"></i><div class="ac"><input id="${id}" placeholder="${ph}" autocomplete="off" aria-label="${ph}"><div class="sg" id="${id}s"></div></div>${id=='oz'?'<button class="sw" data-a="sw" aria-label="Invertir ruta">⇅</button>':'<button class="sw lc" data-a="loc" aria-label="Usar mi ubicación como punto de partida" title="Usar mi ubicación">'+LOC+'</button>'}</div>`;
+function myLoc(){const b0=$('[data-a="loc"]'),i0=$('#oa'),pv=i0.value;document.querySelectorAll('.sg').forEach(x=>x.className='sg');
+const reset=()=>{const b=$('[data-a="loc"]'),i=$('#oa');if(b){b.disabled=false;b.classList.remove('wait')}if(i)i.placeholder='Punto de partida';return i};
+const fail=m=>{const i=reset();if(!i)return;if(i.value==='')i.value=pv;const sg=$('#oas');sg.innerHTML='<p class="np">'+m+'</p>';sg.className='sg on'};
+if(!navigator.geolocation)return fail('Tu navegador no permite obtener la ubicación.');
+b0.disabled=true;b0.classList.add('wait');i0.value='';i0.placeholder='Obteniendo tu ubicación…';
+navigator.geolocation.getCurrentPosition(async q=>{const i=reset();if(!LM||!i)return;U=[q.coords.latitude,q.coords.longitude];uT='tu ubicación';
+const p={n:'Mi ubicación',lat:U[0],lng:U[1]};setP('a',p);
+try{const r=await(await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=17&lat=${p.lat}&lon=${p.lng}`)).json();if(r.display_name&&A===p&&$('#oa')){p.n=nm(r);$('#oa').value=p.n}}catch(e){}},
+e=>fail(['','Permiso de ubicación denegado. Actívalo en la configuración del navegador.','No se pudo determinar tu ubicación.','La ubicación tardó demasiado. Intenta de nuevo.'][e.code]||'No se pudo obtener tu ubicación.'),
+{enableHighAccuracy:true,timeout:10000,maximumAge:30000})}
 const main=()=>`<div class="bar"><div class="bh">${logo(30)}RutaFuel<button class="chip" data-a="edit">${S.m} ${S.y}</button></div>${field('oa','Punto de partida','d1')}${field('oz','Destino','d2')}<div class="f"><i></i><span class="tm">Salida</span><input id="hr" type="time" value="${HR||hm(bog())}" aria-label="Hora de salida"><button class="chip" data-a="now">Ahora</button></div></div><div class="map"><div id="mp"></div></div><div class="sheet" id="sh"></div>`;
 const hint='<p>Escribe una dirección, barrio o lugar, o toca el mapa para elegir tu punto de partida y tu destino.</p>';
 function sheet(km,min,apx){LR={km,min,apx};const r=TR(),e=eff(r.f),L=km/e,g=L/3.785,s=ST[S.st],mn=Math.round(min*r.t),ex=Math.round((.95/r.f-1)*100);
@@ -93,6 +106,7 @@ function render(){if(LM){LM.remove();LM=null}const s=S.step;app.innerHTML=s<5?`<
 app.addEventListener('click',e=>{const t=e.target.closest('[data-a]'),d=t&&t.dataset;
 if(d&&d.a=='sug'){const p=SG[d.f][+d.i];setP(d.f[1],{n:nm(p),lat:+p.lat,lng:+p.lon});$('#'+d.f+'s').className='sg'}
 else if(d&&d.a=='sw'){[A,Z]=[Z,A];$('#oa').value=A?A.n:'';$('#oz').value=Z?Z.n:'';draw()}
+else if(d&&d.a=='loc')myLoc();
 else if(d&&d.a=='now'){HR=null;$('#hr').value=hm(bog());if(LR)sheet(LR.km,LR.min,LR.apx)}
 else if(!e.target.closest('.ac'))document.querySelectorAll('.sg').forEach(x=>x.className='sg')});
 app.addEventListener('input',e=>{const id=e.target.id;if(id!='oa'&&id!='oz')return;clearTimeout(TO);const q=e.target.value.trim(),sg=$('#'+id+'s');if(q.length<3){sg.className='sg';return}
